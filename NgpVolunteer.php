@@ -116,7 +116,6 @@ class NgpVolunteer {
      * @return  void
      */
     public function __construct( $credentials, $sendEmail = false, $data = array() ) {
-        $this->client = new SoapClient('http://services.myngp.com/ngpservices/VolunteerSignUpService.asmx?wsdl');
         $this->credentials = $credentials;
         $this->sendEmail = $sendEmail;
         $this->constituentFields = array(
@@ -190,6 +189,21 @@ class NgpVolunteer {
         if ( $this->isValid() === false ) {
             return false;
         }
+        $args = array(
+            'RequestXML' => $this->generateXml(),
+            'transType' => 'ContactSetICampaigns',
+            'credentialString' => $this->credentials
+        );
+        // WP_Http
+        $headers = array(
+            'User-agent': 'RevMsg Wordpress PLugin (support@revmsg.com)',
+        );
+        $result = $request->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
+            'method' => 'POST',
+            'body' => $args,
+            'headers' => $headers
+        ));
+
         $args = array(
             'credentials' => $this->credentials,
             'data' => $this->generateXml()
