@@ -46,35 +46,35 @@ class NGPSignupFrontend {
         
         $this->fields = array(
             array(
-                'name' => 'Name'
+                'name' => 'Name',
                 'type' => 'text',
                 'slug' => 'FullName',
                 'required' => 'false',
-                'label' => 'Name',
+                'label' => 'Name'
             ),
             array(
-                'name' => 'Email'
+                'name' => 'Email',
                 'type' => 'text',
                 'slug' => 'email',
                 'required' => 'true',
                 'label' => 'Email Address'
             ),
             array(
-                'name' => 'Phone'
+                'name' => 'Phone',
                 'type' => 'text',
                 'slug' => 'mobilePhone',
                 'required' => 'false',
                 'label' => 'Mobile Number'
             ),
             array(
-                'name' => 'StreetAddress'
+                'name' => 'StreetAddress',
                 'type' => 'text',
                 'slug' => 'address1',
                 'required' => 'false',
                 'label' => 'Street Address'
             ),
             array(
-                'name' => 'Zip'
+                'name' => 'Zip',
                 'type' => 'text',
                 'slug' => 'zip',
                 'required' => 'false',
