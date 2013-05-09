@@ -454,21 +454,19 @@ class NGPVolunteerFrontend {
             echo '.</div>';
         }
         
+        $return = '';
         if(!empty($form_fields)) {
-        ?>
-            <form name="ngp_user_news" class="ngp_user_submission" id="ngp_volunteer_form" action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
-                <?php
+            $return .= '<form name="ngp_user_news" class="ngp_user_submission" id="ngp_volunteer_form" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
                 if(function_exists('wp_nonce_field')) {
-                    wp_nonce_field('ngp_nonce_field', 'ngp_volunteer');
+                    $return .= wp_nonce_field('ngp_nonce_field', 'ngp_volunteer', true, false);
                 }
-                echo $form_fields;
-                ?>
-                <div class="submit">
+                $return .= $form_fields;
+                $return .= '<div class="submit">
                     <input type="submit" value="volunteer!" />
                 </div>
-            </form>
-            <?php
+            </form>';
         }
+        return $return;
     }
 }
 $ngpVolunteerFrontend = new NGPVolunteerFrontend();
@@ -478,7 +476,7 @@ function ngp_process_volunteer() {
     $ngpVolunteerFrontend->process_form();
 }
 
-function ngp_show_volunteer() {
+function ngp_show_volunteer($atts=null, $form=true) {
     global $ngpVolunteerFrontend;
-    $ngpVolunteerFrontend->show_form();
+    return $ngpVolunteerFrontend->show_form($atts=null, $form=true);
 }

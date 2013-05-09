@@ -29,6 +29,8 @@ $GLOBALS['ngp'] = (object) array(
 include_once(dirname(__FILE__).'/ngp-donation-frontend.php');
 include_once(dirname(__FILE__).'/ngp-signup-frontend.php');
 include_once(dirname(__FILE__).'/ngp-volunteer-frontend.php');
+var_dump("here");
+exit();
 
 if(strpos($_SERVER['REQUEST_URI'], 'ngp-donations/admin')!==false) {
     include_once(dirname(__FILE__).'/ngp-manage.php');

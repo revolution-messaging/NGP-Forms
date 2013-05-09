@@ -183,7 +183,7 @@ class NgpSignup {
         );
         // WP_Http
         $headers = array(
-            'User-agent': 'RevMsg Wordpress PLugin (support@revmsg.com)',
+            'User-agent': 'RevMsg Wordpress Plugin (support@revmsg.com)',
         );
         $result = $request->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
             'method' => 'POST',

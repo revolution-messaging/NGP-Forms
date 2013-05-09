@@ -196,7 +196,7 @@ class NgpVolunteer {
         );
         // WP_Http
         $headers = array(
-            'User-agent': 'RevMsg Wordpress PLugin (support@revmsg.com)',
+            'User-agent' => 'RevMsg Wordpress Plugin (support@revmsg.com)'
         );
         $result = $request->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
             'method' => 'POST',
@@ -211,6 +211,8 @@ class NgpVolunteer {
         try {
             $res = $this->client->PostVerisignTransaction($args);
             $this->result = new SimpleXMLElement($res->VolunteerSignupResponse);
+            var_dump($this->result);
+            exit();
             if($this->result->Message=='An unexpected error has occurred.') { return false; } else {
                 return (int)$this->result->VendorResult->Result === 0;
             }
