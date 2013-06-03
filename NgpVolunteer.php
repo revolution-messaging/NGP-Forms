@@ -115,30 +115,29 @@ class NgpVolunteer {
      * @param   array   $data           Key-value array of field names and values
      * @return  void
      */
-    public function __construct( $credentials, $sendEmail = false, $data = array() ) {
-        $this->client = new SoapClient('http://services.myngp.com/ngpservices/VolunteerSignUpService.asmx?wsdl');
+    public function __construct( $credentials, $data = array() ) {
+        $this->client = new SoapClient('https://services.myngp.com/ngponlineservices/VolunteerSignUpService.asmx?wsdl');
         $this->credentials = $credentials;
         $this->constituentFields = array(
             'LastName' => '', //REQUIRED
             'FirstName' => '', //REQUIRED
-            'MiddleName' => '',
-            'Prefix' => '',
-            'Suffix' => '',
+            // 'MiddleName' => '',
+            // 'Prefix' => '',
+            // 'Suffix' => '',
             'Address1' => '', //REQUIRED
-            'Address2' => '',
-            'Address3' => '',
+            // 'Address2' => '',
+            // 'Address3' => '',
             'City' => '',
             'State' => '',
             'Zip' => '', //REQUIRED
-            'Salutation' => '',
+            // 'Salutation' => '',
             'Email' => '',
             'HomePhone' => '',
             'WorkPhone' => '',
-            'WorkExtension' => '',
-            'FaxPhone' => '',
-            'Employer' => '',
-            'Occupation' => '',
-            'OptIn' => true, //bool
+            // 'WorkExtension' => '',
+            // 'FaxPhone' => '',
+            // 'Employer' => '',
+            // 'Occupation' => ''
         );
         $this->volunteerFields = array(
             'Code' => 'WEBSITE',
@@ -152,6 +151,7 @@ class NgpVolunteer {
         $this->requiredFields = array(
             'FirstName',
             'LastName',
+            'Address1',
             'Zip',
             'Phone',
             'Email'
@@ -189,25 +189,15 @@ class NgpVolunteer {
         if ( $this->isValid() === false ) {
             return false;
         }
-        echo '<pre><code>';
-        var_dump(array(
-            'method' => 'POST',
-            'body' => $args,
-            'headers' => $headers
-        ));
-        echo '</code></pre>';
-        if ( $this->isValid() === false ) {
-            return false;
-        }
         $args = array(
             'credentials' => $this->credentials,
             'data' => $this->generateXml()
         );
         try {
-            $res = $this->client->'[VolunteerSomething]'($args);
-            $this->result = new SimpleXMLElement($res->PostVerisignTransactionResult);
-            if($this->result->Message=='An unexpected error has occurred.') { return false; } else {
-                return (int)$this->result->VendorResult->Result === 0;
+            $res = $this->client->VolunteerSignUp($args);
+            $this->result = new SimpleXMLElement($res->VolunteerSignUpResult);
+            if(isset($this->result->errorMsg)) { return false; } else {
+                return (int)$this->result->successMsg === 0;
             }
         } catch ( SoapFault $e ) {
             $this->fault = $e;
@@ -257,8 +247,9 @@ class NgpVolunteer {
             }
             if ( !empty($this->allFields[$name]) ) {
                 $xml .= sprintf('<%s>%s</%s>', $name, $this->allFields[$name], $name);
-            } else {
-                $xml .= sprintf('<%s/>', $name);
+            }
+            else {
+                $xml .= sprintf('<%s></%s>', $name, $name);
             }
         }
         $xml .= '</ContactInfo>';

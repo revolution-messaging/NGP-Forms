@@ -29,8 +29,6 @@ $GLOBALS['ngp'] = (object) array(
 include_once(dirname(__FILE__).'/ngp-donation-frontend.php');
 include_once(dirname(__FILE__).'/ngp-signup-frontend.php');
 include_once(dirname(__FILE__).'/ngp-volunteer-frontend.php');
-var_dump("here");
-exit();
 
 if(strpos($_SERVER['REQUEST_URI'], 'ngp-donations/admin')!==false) {
     include_once(dirname(__FILE__).'/ngp-manage.php');
@@ -47,31 +45,12 @@ add_shortcode('ngp_show_volunteer', 'ngp_show_volunteer');
 if(isset($_POST['ngp_add'])) {
     add_action('wp', 'ngp_process_form');
 }
+if(isset($_POST['ngp_volunteer'])) {
+    add_action('wp', 'ngp_process_volunteer');
+}
 
 function ngp_admin_init() {
     // add_action('admin_menu', 'ngp_plugin_menu');
-    register_setting('general', 'ngp_coo_api_key', 'esc_attr');
-    add_settings_field(
-        'ngp_coo_api_key',
-        '<label for="ngp_coo_api_key">'.__('NGP COO API Key' , 'ngp_coo_api_key' ).'</label>',
-        'ngp_coo_api_key_field',
-        'general'
-    );
-    register_setting('general', 'ngp_campaignid', 'esc_attr');
-    add_settings_field(
-        'ngp_campaignid',
-        '<label for="ngp_campaignid">'.__('NGP Campaign ID' , 'ngp_campaignid' ).'</label>',
-        'ngp_campaignid_field',
-        'general'
-    );
-    register_setting('general', 'ngp_userid', 'esc_attr');
-    add_settings_field(
-        'ngp_userid',
-        '<label for="ngp_userid">'.__('NGP User ID' , 'ngp_userid' ).'</label>',
-        'ngp_userid_field',
-        'general'
-    );
-
     register_setting('general', 'ngp_api_key', 'esc_attr');
     add_settings_field(
         'ngp_api_key',
@@ -79,10 +58,17 @@ function ngp_admin_init() {
         'ngp_api_key_field',
         'general'
     );
+    register_setting('general', 'ngp_volunteer_thanks_url', 'esc_attr');
+    add_settings_field(
+        'ngp_volunteer_thanks_url',
+        '<label for="ngp_volunteer_thanks_url">'.__('"Thanks for Volunteering" URL' , 'ngp_volunteer_thanks_url' ).'<br /><small>(e.g. /thank-you-for-volunteering")</small></label>',
+        'ngp_volunteer_thanks_url_field',
+        'general'
+    );
     register_setting('general', 'ngp_thanks_url', 'esc_attr');
     add_settings_field(
         'ngp_thanks_url',
-        '<label for="ngp_api_key">'.__('"Thanks for Contributing" URL' , 'ngp_thanks_url' ).'<br /> (e.g. "/thank-you")</label>',
+        '<label for="ngp_api_key">'.__('"Thanks for Contributing" URL' , 'ngp_thanks_url' ).'<br /><small>(e.g. "/thank-you")</small></label>',
         'ngp_thanks_url_field',
         'general'
     );
@@ -114,28 +100,40 @@ function ngp_admin_init() {
         'ngp_footer_info',
         'general'
     );
+
+    register_setting('general', 'ngp_coo_api_key', 'esc_attr');
+    add_settings_field(
+        'ngp_coo_api_key',
+        '<label for="ngp_coo_api_key">'.__('NGP COO API Key <small>(optional)</small>' , 'ngp_coo_api_key' ).'</label>',
+        'ngp_coo_api_key_field',
+        'general'
+    );
+    register_setting('general', 'ngp_campaignid', 'esc_attr');
+    add_settings_field(
+        'ngp_campaignid',
+        '<label for="ngp_campaignid">'.__('NGP Campaign ID <small>(optional)</small>' , 'ngp_campaignid' ).'</label>',
+        'ngp_campaignid_field',
+        'general'
+    );
+    register_setting('general', 'ngp_userid', 'esc_attr');
+    add_settings_field(
+        'ngp_userid',
+        '<label for="ngp_userid">'.__('NGP User ID <small>(optional)</small>' , 'ngp_userid' ).'</label>',
+        'ngp_userid_field',
+        'general'
+    );
     // add_action('wp_head', 'ngp_head');
     // add_action('admin_head', 'ngp_head');
 }
 
 function ngp_api_key_field() {
-    $value = get_option('ngp_coo_api_key', '');
-    echo '<input type="text" style="width:300px;" id="ngp_coo_api_key" name="ngp_coo_api_key" value="' . $value . '" />';
-}
-
-function ngp_userid_field() {
-    $value = get_option('ngp_userid', '');
-    echo '<input type="text" style="width:300px;" id="ngp_userid" name="ngp_userid" value="' . $value . '" />';
-}
-
-function ngp_campaignid_field() {
-    $value = get_option('ngp_campaignid', '');
-    echo '<input type="text" style="width:300px;" id="ngp_campaignid" name="ngp_campaignid" value="' . $value . '" />';
-}
-
-function ngp_api_key_field() {
     $value = get_option('ngp_api_key', '');
     echo '<input type="text" style="width:300px;" id="ngp_api_key" name="ngp_api_key" value="' . $value . '" />';
+}
+
+function ngp_volunteer_thanks_url_field() {
+    $value = get_option('ngp_volunteer_thanks_url', '');
+    echo '<input type="text" style="width:300px;" id="ngp_volunteer_thanks_url" name="ngp_volunteer_thanks_url" value="' . $value . '" />';
 }
 
 function ngp_thanks_url_field() {
@@ -164,6 +162,21 @@ function ngp_accept_amex() {
 function ngp_footer_info() {
     $value = get_option('ngp_footer_info', '');
     echo '<textarea style="width:300px;height:150px;" id="ngp_footer_info" name="ngp_footer_info">'.$value.'</textarea>';
+}
+
+function ngp_coo_api_key_field() {
+    $value = get_option('ngp_coo_api_key', '');
+    echo '<input type="text" style="width:300px;" id="ngp_coo_api_key" name="ngp_coo_api_key" value="' . $value . '" />';
+}
+
+function ngp_userid_field() {
+    $value = get_option('ngp_userid', '');
+    echo '<input type="text" style="width:300px;" id="ngp_userid" name="ngp_userid" value="' . $value . '" />';
+}
+
+function ngp_campaignid_field() {
+    $value = get_option('ngp_campaignid', '');
+    echo '<input type="text" style="width:300px;" id="ngp_campaignid" name="ngp_campaignid" value="' . $value . '" />';
 }
 
 // register_activation_hook(__FILE__, 'psc_activate');

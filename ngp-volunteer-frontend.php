@@ -38,13 +38,7 @@ class NGPVolunteerFrontend {
      */
     function __construct() {
         $this->api_key = get_option('ngp_api_key', '');
-        $this->ngp_api_key = get_option('ngp_coo_api_key', '');
-        $this->userID = get_option('ngp_user_id', '');
-        $this->campaignID = get_option('ngp_campaign_id', '');
         $this->support_phone = get_option('ngp_support_phone', '');
-        
-        // To be pulled from DB later.
-        // $this->redirect_url = $res[0]->redirect_url;
         $this->redirect_url = get_option('ngp_volunteer_thanks_url', '/thank-you-for-volunteering');
         
         $this->fields = array(
@@ -66,12 +60,12 @@ class NGPVolunteerFrontend {
                 'required' => 'false',
                 'label' => 'Phone'
             ),
-            // array(
-            //     'type' => 'text',
-            //     'slug' => 'Address1',
-            //     'required' => 'true',
-            //     'label' => 'Street Address'
-            // ),
+            array(
+                'type' => 'text',
+                'slug' => 'Address1',
+                'required' => 'true',
+                'label' => 'Street Address'
+            ),
             // array(
             //     'type' => 'text',
             //     'slug' => 'Address2',
@@ -154,21 +148,7 @@ class NGPVolunteerFrontend {
                         $cons_data['LastName'] = $names[(count($names)-1)];
                     }
                     require_once(dirname(__FILE__).'/NgpVolunteer.php');
-                    // require_once(dirname(__FILE__).'/NgpSignup.php');
-                    // $constituent = new NgpSignup(
-                    //     array(
-                    //         'credentials' => $this->ngp_api_key,
-                    //         'userID' => $this->userID,
-                    //         'campaignID' => $this->campaignID
-                    //     ),
-                    //     $cons_data
-                    // );
-                    // $constituent->save();
-                    $volunteer = new NgpVolunteer(array(
-                        'ngpapi'=>$this->ngp_api_key,
-                        'campaignID'=>$this->campaignID,
-                        'userID'=>$this->userID), $cons_data
-                    );
+                    $volunteer = new NgpVolunteer($this->api_key, $cons_data);
                     if($volunteer->save()) {
                         // Success!
                         // Redirect.
@@ -205,11 +185,11 @@ class NGPVolunteerFrontend {
         if($thanks_url!==null) {
             $this->redirect_url = $thanks_url;
         }
-        $this->main_code = $main_code;
-        $this->campaign_id = $campaign_id;
+        // $this->main_code = $main_code;
+        // $this->campaign_id = $campaign_id;
         
         $check_security = $this->check_security();
-    
+        
         if($check_security!==true) {
             return false;
             exit();
