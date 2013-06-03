@@ -50,6 +50,28 @@ if(isset($_POST['ngp_add'])) {
 
 function ngp_admin_init() {
     // add_action('admin_menu', 'ngp_plugin_menu');
+    register_setting('general', 'ngp_coo_api_key', 'esc_attr');
+    add_settings_field(
+        'ngp_coo_api_key',
+        '<label for="ngp_coo_api_key">'.__('NGP COO API Key' , 'ngp_coo_api_key' ).'</label>',
+        'ngp_coo_api_key_field',
+        'general'
+    );
+    register_setting('general', 'ngp_campaignid', 'esc_attr');
+    add_settings_field(
+        'ngp_campaignid',
+        '<label for="ngp_campaignid">'.__('NGP Campaign ID' , 'ngp_campaignid' ).'</label>',
+        'ngp_campaignid_field',
+        'general'
+    );
+    register_setting('general', 'ngp_userid', 'esc_attr');
+    add_settings_field(
+        'ngp_userid',
+        '<label for="ngp_userid">'.__('NGP User ID' , 'ngp_userid' ).'</label>',
+        'ngp_userid_field',
+        'general'
+    );
+
     register_setting('general', 'ngp_api_key', 'esc_attr');
     add_settings_field(
         'ngp_api_key',
@@ -94,6 +116,21 @@ function ngp_admin_init() {
     );
     // add_action('wp_head', 'ngp_head');
     // add_action('admin_head', 'ngp_head');
+}
+
+function ngp_api_key_field() {
+    $value = get_option('ngp_coo_api_key', '');
+    echo '<input type="text" style="width:300px;" id="ngp_coo_api_key" name="ngp_coo_api_key" value="' . $value . '" />';
+}
+
+function ngp_userid_field() {
+    $value = get_option('ngp_userid', '');
+    echo '<input type="text" style="width:300px;" id="ngp_userid" name="ngp_userid" value="' . $value . '" />';
+}
+
+function ngp_campaignid_field() {
+    $value = get_option('ngp_campaignid', '');
+    echo '<input type="text" style="width:300px;" id="ngp_campaignid" name="ngp_campaignid" value="' . $value . '" />';
 }
 
 function ngp_api_key_field() {
