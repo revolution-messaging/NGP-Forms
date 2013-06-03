@@ -49,7 +49,7 @@ class NGPSignupFrontend {
                 'name' => 'Name',
                 'type' => 'text',
                 'slug' => 'FullName',
-                'required' => 'false',
+                'required' => 'true',
                 'label' => 'Name'
             ),
             array(
@@ -60,24 +60,10 @@ class NGPSignupFrontend {
                 'label' => 'Email Address'
             ),
             array(
-                'name' => 'Phone',
-                'type' => 'text',
-                'slug' => 'mobilePhone',
-                'required' => 'false',
-                'label' => 'Mobile Number'
-            ),
-            array(
-                'name' => 'StreetAddress',
-                'type' => 'text',
-                'slug' => 'address1',
-                'required' => 'false',
-                'label' => 'Street Address'
-            ),
-            array(
                 'name' => 'Zip',
                 'type' => 'text',
                 'slug' => 'zip',
-                'required' => 'false',
+                'required' => 'true',
                 'label' => 'Zip Code'
             )
         );
@@ -115,7 +101,7 @@ class NGPSignupFrontend {
         if(!empty($_POST)) {
             if(wp_verify_nonce($_POST['ngp_signup'], 'ngp_nonce_field')) // && $_POST['ngp_form_id']==$id
             {
-                foreach($this->fiels as $key => $field) {
+                foreach($this->fields as $key => $field) {
                     if($field['required']=='true' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']]))) {
                         $this->fields[$key]['error'] = true;
                         $this->any_errors = true;
@@ -141,16 +127,20 @@ class NGPSignupFrontend {
                         $cons_data['firstName'] = $names[0];
                         $cons_data['lastName'] = $names[(count($names)-1)];
                     }
-                    
                     require_once(dirname(__FILE__).'/NgpEmailSignup.php');
-                    $signup = new NgpEmailSignup(array(
-                            'credentials'=>$this->api_key,
-                            'mainCode'=>$this->api_key,
-                            'campaignID'=>$this->api_key
-                        ),
-                        $cons_data
-                    );
-                    if($donation->save()) {
+                    if($this->userID && $this->campaignID) {
+                        $signup = new NgpEmailSignup(array(
+                                'credentials'=>$this->api_key,
+                                'mainCode'=>$this->main_code,
+                                'userID'=>$this->userID,
+                                'campaignID'=>$this->campaignID
+                            ),
+                            $cons_data
+                        );
+                    } else {
+                        $signup = new NgpEmailSignup(array('credentials' => $this->api_key), $cons_data);
+                    }
+                    if($signup->save()) {
                         // Success!
                         // Redirect.
                         $_POST = array();
