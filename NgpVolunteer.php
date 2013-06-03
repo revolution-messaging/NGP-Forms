@@ -116,8 +116,8 @@ class NgpVolunteer {
      * @return  void
      */
     public function __construct( $credentials, $sendEmail = false, $data = array() ) {
+        $this->client = new SoapClient('http://services.myngp.com/ngpservices/VolunteerSignUpService.asmx?wsdl');
         $this->credentials = $credentials;
-        $this->sendEmail = $sendEmail;
         $this->constituentFields = array(
             'LastName' => '', //REQUIRED
             'FirstName' => '', //REQUIRED
@@ -142,7 +142,7 @@ class NgpVolunteer {
         );
         $this->volunteerFields = array(
             'Code' => 'WEBSITE',
-            'note' => 'Wants to volunteer.',
+            'note' => 'Wants to volunteer. Signed up on website.',
         );
         $this->allFields = array_merge(
             $this->constituentFields,
@@ -189,30 +189,23 @@ class NgpVolunteer {
         if ( $this->isValid() === false ) {
             return false;
         }
-        $args = array(
-            'RequestXML' => $this->generateXml(),
-            'transType' => 'ContactSetICampaigns',
-            'credentialString' => $this->credentials
-        );
-        // WP_Http
-        $headers = array(
-            'User-agent' => 'RevMsg Wordpress Plugin (support@revmsg.com)'
-        );
-        $result = $request->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
+        echo '<pre><code>';
+        var_dump(array(
             'method' => 'POST',
             'body' => $args,
             'headers' => $headers
         ));
-
+        echo '</code></pre>';
+        if ( $this->isValid() === false ) {
+            return false;
+        }
         $args = array(
             'credentials' => $this->credentials,
             'data' => $this->generateXml()
         );
         try {
-            $res = $this->client->PostVerisignTransaction($args);
-            $this->result = new SimpleXMLElement($res->VolunteerSignupResponse);
-            var_dump($this->result);
-            exit();
+            $res = $this->client->'[VolunteerSomething]'($args);
+            $this->result = new SimpleXMLElement($res->PostVerisignTransactionResult);
             if($this->result->Message=='An unexpected error has occurred.') { return false; } else {
                 return (int)$this->result->VendorResult->Result === 0;
             }
@@ -236,7 +229,7 @@ class NgpVolunteer {
      */
     public function isValid() {
         $this->errors = array();
-        
+
         //Check requiredness
         foreach( $this->requiredFields as $field ) {
             if ( !isset($this->allFields[$field]) || empty($this->allFields[$field]) ) {

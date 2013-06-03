@@ -38,6 +38,9 @@ class NGPVolunteerFrontend {
      */
     function __construct() {
         $this->api_key = get_option('ngp_api_key', '');
+        $this->ngp_api_key = get_option('ngp_coo_api_key', '');
+        $this->userID = get_option('ngp_user_id', '');
+        $this->campaignID = get_option('ngp_campaign_id', '');
         $this->support_phone = get_option('ngp_support_phone', '');
         
         // To be pulled from DB later.
@@ -59,7 +62,7 @@ class NGPVolunteerFrontend {
             ),
             array(
                 'type' => 'text',
-                'slug' => 'HomePhone',
+                'slug' => 'Phone',
                 'required' => 'false',
                 'label' => 'Phone'
             ),
@@ -124,7 +127,7 @@ class NGPVolunteerFrontend {
         if(!empty($_POST)) {
             if(wp_verify_nonce($_POST['ngp_volunteer'], 'ngp_nonce_field')) // && $_POST['ngp_form_id']==$id
             {
-                foreach($this->fiels as $key => $field) {
+                foreach($this->fields as $key => $field) {
                     if($field['required']=='true' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']]))) {
                         $this->fields[$key]['error'] = true;
                         $this->any_errors = true;
@@ -147,19 +150,26 @@ class NGPVolunteerFrontend {
                         $names = explode(' ', $_POST['FullName']);
                         // Attempt payment
                         unset($cons_data['FullName']);
-                        $cons_data['firstName'] = $names[0];
-                        $cons_data['lastName'] = $names[(count($names)-1)];
+                        $cons_data['FirstName'] = $names[0];
+                        $cons_data['LastName'] = $names[(count($names)-1)];
                     }
-                    
                     require_once(dirname(__FILE__).'/NgpVolunteer.php');
+                    // require_once(dirname(__FILE__).'/NgpSignup.php');
+                    // $constituent = new NgpSignup(
+                    //     array(
+                    //         'credentials' => $this->ngp_api_key,
+                    //         'userID' => $this->userID,
+                    //         'campaignID' => $this->campaignID
+                    //     ),
+                    //     $cons_data
+                    // );
+                    // $constituent->save();
                     $volunteer = new NgpVolunteer(array(
-                            'credentials'=>$this->api_key,
-                            'mainCode'=>$this->api_key,
-                            'campaignID'=>$this->api_key
-                        ),
-                        $cons_data
+                        'ngpapi'=>$this->ngp_api_key,
+                        'campaignID'=>$this->campaignID,
+                        'userID'=>$this->userID), $cons_data
                     );
-                    if($donation->save()) {
+                    if($volunteer->save()) {
                         // Success!
                         // Redirect.
                         $_POST = array();

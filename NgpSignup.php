@@ -111,30 +111,31 @@ class NgpSignup {
         if( !class_exists( 'WP_Http' ) )
             include_once( ABSPATH . WPINC. '/class-http.php' );
         $this->client = new WP_Http();
-        $this->credentialString = $configuration['credentials'];
-        $this->userID = $configuration['userID'];
-        $this->campaignID = $configuration['campaignID'];
+        if(is_array($configuration) && count($configuration)==3) {
+            $this->credentialString = $configuration['credentials'];
+            $this->userID = $configuration['userID'];
+            $this->campaignID = $configuration['campaignID'];
+        } else if(is_array($configuration) && count($configuration)==1) {
+            $this->credentialString = $configuration['credentials'];
+        }
         // http://www.myngp.com/ngpapi/transactions/Contact/Contact.xsd
         $this->constituentFields = array(
-            'lastName' => '', //REQUIRED
-            'firstName' => '', //REQUIRED
-            'middleName' => '',
-            'prefix' => '',
-            'suffix' => '',
-            'address1' => '', //REQUIRED
-            'address2' => '',
-            'city' => '',
-            'state' => '',
-            'zip' => '', //REQUIRED
-            'salutation' => '',
-            'email' => '',
-            'homePhone' => '',
-            'workPhone' => '',
-            'workExtension' => '',
-            'mobilePhone' => '',
-            'smsOptIn' => true, //bool
-            'employer' => '',
-            'occupation' => '',
+            'LastName' => '', //REQUIRED
+            'FirstName' => '', //REQUIRED
+            'MiddleName' => '',
+            'Prefix' => '',
+            'Suffix' => '',
+            'Address1' => '', //REQUIRED
+            'Address2' => '',
+            'City' => '',
+            'State' => '',
+            'Zip' => '', //REQUIRED
+            'Salutation' => '',
+            'Email' => '',
+            'Phone' => '',
+            'SmsOptIn' => true, //bool
+            'Employer' => '',
+            'Occupation' => '',
         );
         $this->allFields = array_merge(
             $this->constituentFields,
@@ -183,14 +184,17 @@ class NgpSignup {
         );
         // WP_Http
         $headers = array(
-            'User-agent': 'RevMsg Wordpress Plugin (support@revmsg.com)',
+            'User-agent' => 'RevMsg Wordpress Plugin (support@revmsg.com)',
         );
-        $result = $request->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
+        $result = $this->client->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
             'method' => 'POST',
             'body' => $args,
             'headers' => $headers
         ));
+        echo '<pre><code>';
         var_dump($result);
+        echo '</code></pre>';
+        exit();
         // test $result['response'] and if OK do something with $result['body']
         
         // SOAP
@@ -235,17 +239,17 @@ class NgpSignup {
      */
     public function generateXml() {
         $xml = '<ngp:contactSetICampaigns xmlns:ngp="http://www.ngpsoftware.com/ngpapi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
-        $xml .= '<campaignID>'.$this->campaignID.'</campaignID>';
-        $xml .= '<userID>'.$this->userID.'</userID>';
+        $xml .= '<campaignID>'.$this->campaignID.'</campaignID>'; // $this->campaignID
+        $xml .= '<userID>'.$this->userID.'</userID>'; // $this->userID
         $xml .= '<contact xsi:type="ngp:Contact">';
-        $xml .= ( isset( $this->constituentFields['LastName'] ) && !empty( $this->constituentFields['LastName'] ) ) ? "<lastName>{".$this->constituentFields['LastName']."}</lastName>" : '<lastName />';
-        $xml .= ( isset( $this->constituentFields['FirstName'] ) && !empty( $this->constituentFields['FirstName'] ) ) ? "<firstName>{".$this->constituentFields['FirstName']."}</firstName>" : '<firstName />';
-        $xml .= ( isset( $this->constituentFields['Zip'] ) && !empty( $this->constituentFields['Zip'] ) ) ? "<zip>{".$this->constituentFields['Zip']."}</zip>" : '<zip />';
-        $xml .= ( isset( $this->constituentFields['Email'] ) && !empty( $this->constituentFields['Email'] ) ) ? "<email>{".$this->constituentFields['Email']."}</email>" : '<email />';
-        if(isset($this->constituentFields['Phone']) && !empty($this->constituentFields['Phone'])) {
-            $the_phone = $this->constituentFields['Phone'];
+        $xml .= ( isset( $this->allFields['LastName'] ) && !empty( $this->allFields['LastName'] ) ) ? "<lastName>{".$this->allFields['LastName']."}</lastName>" : '<lastName />';
+        $xml .= ( isset( $this->allFields['FirstName'] ) && !empty( $this->allFields['FirstName'] ) ) ? "<firstName>{".$this->allFields['FirstName']."}</firstName>" : '<firstName />';
+        $xml .= ( isset( $this->allFields['Zip'] ) && !empty( $this->allFields['Zip'] ) ) ? "<zip>{".$this->allFields['Zip']."}</zip>" : '<zip />';
+        $xml .= ( isset( $this->allFields['Email'] ) && !empty( $this->allFields['Email'] ) ) ? "<email>{".$this->allFields['Email']."}</email>" : '<email />';
+        if(isset($this->allFields['Phone']) && !empty($this->allFields['Phone'])) {
+            $the_phone = $this->allFields['Phone'];
             $the_phone = str_replace('+', '', $the_phone);
-            $xml .= '<mobilePhone>'+$the_phone+'</mobilePhone>';
+            $xml .= '<mobilePhone>'.$the_phone.'</mobilePhone>';
             $xml .= '<smsOptIn>1</smsOptIn>';
         }
         $xml .= "</contact>";
