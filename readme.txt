@@ -37,7 +37,7 @@ Place this short tag on the appropriate page or article:
 
 You can set custom amounts for the donation amount in two ways:
 
-1. Put the amounts in the embed tag: `[ngp_show_form amounts="50,250,1000"]`
+1. Put the amounts in the embed tag: `[ngp_show_donation amounts="50,250,1000"]`
 2. Put the amounts in a GET querystring: `http://mycamapign.com/donation?amounts=50,250,1000`
 
 If you want to have a default donation amounts, put them in the embed tag and then override it with a querystring amounts when you need to.
@@ -49,11 +49,27 @@ You can source an article in two ways:
 
 If you want to have a default donation source, put it in the embed tag and then override it with a querystring source when you need to.
 
+You can set custom thanks URL for the donation process by putting the url in the embed tag:
+
+`[ngp_show_donation thanks_url="/thanks-for-your-donation"]`
+
+The donations thanks URL defaults to: `/thank-you-for-your-contribution`
+
 `[ngp_show_volunteer]`
 
+You can set custom thanks URL for the donation process by putting the url in the embed tag:
 
+`[ngp_show_volunteer thanks_url="/thanks-for-your-work-pledge"]`
+
+The volunteer thanks URL defaults to: `/thank-you-for-volunteering`
 
 `[ngp_show_signup]`
+
+You can set custom thanks URL for the email signup process by putting the url in the embed tag:
+
+`[ngp_show_signup thanks_url="/thanks-for-signing-up-for-incessant-emails"]`
+
+The email signup thanks URL defaults to: `/thank-you-for-signing-up`
 
 === Suggested Donation jQuery ===
 

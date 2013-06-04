@@ -40,8 +40,6 @@ class NGPSignupFrontend {
         $this->api_key = get_option('ngp_api_key', '');
         $this->support_phone = get_option('ngp_support_phone', '');
         
-        // To be pulled from DB later.
-        // $this->redirect_url = $res[0]->redirect_url;
         $this->redirect_url = get_option('ngp_signup_thanks_url', '/thank-you-for-signing-up');
         
         $this->fields = array(
@@ -246,10 +244,10 @@ class NGPSignupFrontend {
         global $wpdb, $ngp;
         
         extract( shortcode_atts( array(
-            'source' => null,
+            // 'source' => null,
             'fields' => null,
-            'main_code' => null,
-            'campaign_id' => null,
+            // 'main_code' => null,
+            // 'campaign_id' => null,
             'thanks_url' => null
         ), $atts ) );
         
@@ -266,14 +264,15 @@ class NGPSignupFrontend {
             exit();
         }
         
-        if(isset($fields) && !empty($fields)) {
-            $fields = explode('|', $fields);
-            $final_fields = array();
-            foreach($fields as $field) {
-                if(in_array($field, array('FullName', 'Zip', 'Email', 'Phone')))
-                    $final_fields[] = $field;
-            }
-        }
+        // Coming Soon (when this works with the COO API)
+        // if(isset($fields) && !empty($fields)) {
+        //     $fields = explode('|', $fields);
+        //     $final_fields = array();
+        //     foreach($fields as $field) {
+        //         if(in_array($field, array('FullName', 'Zip', 'Email', 'Phone')))
+        //             $final_fields[] = $field;
+        //     }
+        // }
         
         if(!empty($_POST)) {
             $this->process_form();

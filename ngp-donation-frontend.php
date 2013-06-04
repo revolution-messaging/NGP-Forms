@@ -95,8 +95,6 @@ class NGPDonationFrontend {
         $this->url_specified = get_option('ngp_secure_url', '');
         $this->support_phone = get_option('ngp_support_phone', '');
         
-        // To be pulled from DB later.
-        // $this->redirect_url = $res[0]->redirect_url;
         $this->redirect_url = get_option('ngp_thanks_url', '/thank-you-for-your-contribution');
         
         $this->fieldsets = array(
