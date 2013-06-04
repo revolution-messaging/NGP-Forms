@@ -59,20 +59,22 @@ function ngp_admin_init() {
         'ngp_api_key_field',
         'general'
     );
-    register_setting('general', 'ngp_volunteer_thanks_url', 'esc_attr');
-    add_settings_field(
-        'ngp_volunteer_thanks_url',
-        '<label for="ngp_volunteer_thanks_url">'.__('"Thanks for Volunteering" URL' , 'ngp_volunteer_thanks_url' ).'<br /><small>(e.g. /thank-you-for-volunteering")</small></label>',
-        'ngp_volunteer_thanks_url_field',
-        'general'
-    );
-    register_setting('general', 'ngp_thanks_url', 'esc_attr');
-    add_settings_field(
-        'ngp_thanks_url',
-        '<label for="ngp_api_key">'.__('"Thanks for Contributing" URL' , 'ngp_thanks_url' ).'<br /><small>(e.g. "/thank-you")</small></label>',
-        'ngp_thanks_url_field',
-        'general'
-    );
+    // register_setting('general', 'ngp_volunteer_thanks_url', 'esc_attr');
+    // add_settings_field(
+    //     'ngp_volunteer_thanks_url',
+    //     '<label for="ngp_volunteer_thanks_url">'.__('"Thanks for Volunteering" URL' , 'ngp_volunteer_thanks_url' ).'<br /><small>(e.g. /thank-you-for-volunteering")</small></label>',
+    //     'ngp_volunteer_thanks_url_field',
+    //     'general'
+    // );
+
+    // register_setting('general', 'ngp_thanks_url', 'esc_attr');
+    // add_settings_field(
+    //     'ngp_thanks_url',
+    //     '<label for="ngp_api_key">'.__('"Thanks for Contributing" URL' , 'ngp_thanks_url' ).'<br /><small>(e.g. "/thank-you")</small></label>',
+    //     'ngp_thanks_url_field',
+    //     'general'
+    // );
+
     register_setting('general', 'ngp_secure_url', 'esc_attr');
     add_settings_field(
         'ngp_secure_url',
@@ -130,15 +132,15 @@ function ngp_api_key_field() {
     echo '<input type="text" style="width:300px;" id="ngp_api_key" name="ngp_api_key" value="' . $value . '" />';
 }
 
-function ngp_volunteer_thanks_url_field() {
-    $value = get_option('ngp_volunteer_thanks_url', '');
-    echo '<input type="text" style="width:300px;" id="ngp_volunteer_thanks_url" name="ngp_volunteer_thanks_url" value="' . $value . '" />';
-}
+// function ngp_volunteer_thanks_url_field() {
+//     $value = get_option('ngp_volunteer_thanks_url', '');
+//     echo '<input type="text" style="width:300px;" id="ngp_volunteer_thanks_url" name="ngp_volunteer_thanks_url" value="' . $value . '" />';
+// }
 
-function ngp_thanks_url_field() {
-    $value = get_option('ngp_thanks_url', '');
-    echo '<input type="text" style="width:300px;" id="ngp_thanks_url" name="ngp_thanks_url" value="' . $value . '" />';
-}
+// function ngp_thanks_url_field() {
+//     $value = get_option('ngp_thanks_url', '');
+//     echo '<input type="text" style="width:300px;" id="ngp_thanks_url" name="ngp_thanks_url" value="' . $value . '" />';
+// }
 
 function ngp_support_phone() {
     $value = get_option('ngp_support_phone', '');

@@ -338,9 +338,12 @@ class NGPDonationFrontend {
                         'VIII'        =>    'VIII'
                     );
                     $payment_data = $_POST;
+                    if(isset($_POST['redirect_url']))
+                        $this->redirect_url = $_POST['redirect_url'];
+                        unset($payment_data['redirect_url']);
                     if(isset($_POST['FullName']) && !empty($_POST['FullName'])) {
+                        // Split name
                         $names = explode(' ', $_POST['FullName']);
-                        // Attempt payment
                         unset($payment_data['ngp_form_id']);
                         unset($payment_data['ngp_add']);
                         unset($payment_data['FullName']);
@@ -489,9 +492,13 @@ class NGPDonationFrontend {
         }
             
         extract( shortcode_atts( array(
-            'amounts' => '',
-            'source' => '',
+            'amounts' => null,
+            'source' => null,
+            'thanks_url' => null,
         ), $atts ) );
+        
+        if($thanks_url)
+            $this->redirect_url = $thanks_url;
         
         if(isset($_GET['amounts']) && !empty($_GET['amounts'])) {
             $amounts = $_GET['amounts'];
@@ -503,7 +510,7 @@ class NGPDonationFrontend {
             $source = $_GET['refcode'];
         }
         
-        if($amounts!='') {
+        if($amounts) {
             $amounts = explode(',', $amounts);
             $this->custom_amt_options = array();
             
@@ -784,6 +791,9 @@ class NGPDonationFrontend {
             }
             
             $return .= $form_fields;
+            if($thanks_url) {
+                $return .= '<input type="hidden" name="redirect_url" value="'.$thanks_url.'" />';
+            }
             
             $return .= '
                 <div class="submit">

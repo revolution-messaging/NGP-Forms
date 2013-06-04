@@ -70,15 +70,10 @@ class NGPSignupFrontend {
     }
     
     /*
-     * Check Security
+     * Check Configuration
      *
-     * This function not only checks that the methods are running under SSL,
-     * but it also makes sure that the API Key has been configured.
-     * If not under SSL and not on a .dev TLD, it redirects first to the URL
-     * specified in the WP General Options panel, if not that, then to the
-     * same URL as the page attempted to load.
      */
-    function check_security() {
+    function check_config() {
         global $wpdb, $ngp;
         if(empty($this->api_key)) {
             return 'Not currently configured.';
@@ -92,8 +87,8 @@ class NGPSignupFrontend {
         global $wpdb, $ngp;
         if($this->been_processed) { return false; exit(); }
         
-        $check_security = $this->check_security();
-        if($check_security!==true) {
+        $check_config = $this->check_config();
+        if($check_config!==true) {
             return false;
             exit();
         }
@@ -109,11 +104,32 @@ class NGPSignupFrontend {
                 }
                 
                 if(!$this->any_errors) {
-                    // Split Name
+                    $namePrefixes = array('Dr', 'Hon', 'Mr', 'Mrs', 'Ms', 'Prof', 'Rep', 'Rev');
+                    $nameSuffixes = array(
+                        'Jr'        =>    'Jr',
+                        'Junior'    =>    'Jr',
+                        'Senior'    =>    'Sr',
+                        'Sr'        =>    'Sr',
+                        'I'            =>    'I',
+                        'i'            =>    'I',
+                        'ii'        =>    'II',
+                        'II'        =>    'II',
+                        'iii'        =>    'III',
+                        'III'        =>    'III',
+                        'iv'        =>    'IV',
+                        'IV'        =>    'IV',
+                        'v'            =>    'V',
+                        'V'            =>    'V',
+                        'VI'        =>    'VI',
+                        'vii'        =>    'VII',
+                        'VII'        =>    'VII',
+                        'viii'        =>    'VIII',
+                        'VIII'        =>    'VIII'
+                    );
                     $cons_data = $_POST;
-                    // if(isset($cons_data['ngp_form_id'])) {
-                    //     unset($cons_data['ngp_form_id']);
-                    // }
+                    if(isset($_POST['redirect_url']))
+                        $this->redirect_url = $_POST['redirect_url'];
+                        unset($cons_data['redirect_url']);
                     if(isset($cons_data['ngp_signup'])) {
                         unset($cons_data['ngp_signup']);
                     }
@@ -121,11 +137,71 @@ class NGPSignupFrontend {
                         unset($cons_data['_wp_http_referer']);
                     }
                     if(isset($_POST['FullName']) && !empty($_POST['FullName'])) {
+                        // Split Name
                         $names = explode(' ', $_POST['FullName']);
-                        // Attempt payment
                         unset($cons_data['FullName']);
-                        $cons_data['firstName'] = $names[0];
-                        $cons_data['lastName'] = $names[(count($names)-1)];
+                        array_walk($names, function(&$value) {
+                            $chars = "\t\n\r\0\x0B,.[]{};:\"'\x00..\x1F";
+                            $value = trim($value, $chars);
+                        });
+                        if(count($names)==1) {
+                            $cons_data['lastName'] = $names[0];
+                        } else if(count($names)==2) {
+                            $cons_data['firstName'] = $names[0];
+                            $cons_data['lastName'] = $names[1];
+                        } else if(count($names)>2) {
+                            // Check for Prefix
+                            array_walk($namePrefixes, function($value, $key, &$the_names) {
+                                if(strlen($the_names[0])==strlen($value) && stripos($the_names[0], $value)!==false && isset($the_names[0])) {
+                                    $the_names['prefix'] = $value;
+                                    unset($the_names[0]);
+                                }
+                            }, &$names);
+                            
+                            // Check for Suffix
+                            array_walk($nameSuffixes, function($value, $key, &$the_names) {
+                                $possible_suffix = null;
+                                foreach($the_names as $k => $v) {
+                                    if(is_int($k)) {
+                                        $possible_skey = $k;
+                                        $possible_suffix = $v;
+                                    }
+                                }
+                                if(strlen($possible_suffix)==strlen($key) && stripos($possible_suffix, $key)!==false) {
+                                    $the_names['suffix'] = $value;
+                                    unset($the_names[$possible_skey]);
+                                }
+                            }, &$names);
+                            
+                            $names = array_merge($names);
+                            if(count($names)==1) {
+                                $cons_data['lastName'] = $names[0];
+                            } else if(count($names)==2) {
+                                $cons_data['firstName'] = $names[0];
+                                $cons_data['lastName'] = $names[1];
+                            } else if(count($names)==3) {
+                                $cons_data['firstName'] = $names[0];
+                                $cons_data['MiddleName'] = $names[1];
+                                $cons_data['lastName'] = $names[2];
+                            } else if(count($names)==4) {
+                                $cons_data['firstName'] = $names[0];
+                                $cons_data['lastName'] = $names[3];
+                            } else {
+                                // Otherwise, let's bail out but save everything
+                                $cons_data['firstName'] = $names[0];
+                                foreach($names as $namekey => $name) {
+                                    if($namekey==0) {
+                                        $cons_data['firstName'] = $name;
+                                    } else {
+                                        if(!isset($cons_data['lastName'])) {
+                                            $cons_data['lastName'] = $name;
+                                        } else {
+                                            $cons_data['lastName'] .= ' '.$name;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     require_once(dirname(__FILE__).'/NgpEmailSignup.php');
                     if($this->userID && $this->campaignID) {
@@ -183,9 +259,9 @@ class NGPSignupFrontend {
         $this->main_code = $main_code;
         $this->campaign_id = $campaign_id;
         
-        $check_security = $this->check_security();
+        $check_config = $this->check_config();
     
-        if($check_security!==true) {
+        if($check_config!==true) {
             return false;
             exit();
         }
@@ -425,35 +501,36 @@ class NGPSignupFrontend {
             }
         }
         
+        $return = '';
         if($this->any_errors) {
-            echo '<div class="errMsg ngp_alert">There were errors in your signup! Please fix below and try again';
+            $return .= '<div class="errMsg ngp_alert">There were errors in your signup! Please fix below and try again';
             if(!empty($this->support_phone)) {
-                echo ' or call '.$this->support_phone;
+                $return .= ' or call '.$this->support_phone;
             }
-            echo '.</div>';
+            $return .= '.</div>';
         } else if($this->ngp_error) {
-            echo '<div class="errMsg ngp_alert">Sorry, but your signup could not be processed. Please try again';
+            $return .= '<div class="errMsg ngp_alert">Sorry, but your signup could not be processed. Please try again';
             if(!empty($this->support_phone)) {
-                echo ' or call '.$this->support_phone;
+                $return .= ' or call '.$this->support_phone;
             }
-            echo '.</div>';
+            $return .= '.</div>';
         }
         
         if(!empty($form_fields)) {
-        ?>
-            <form name="ngp_user_news" class="ngp_user_submission" id="ngp_signup_form" action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
-                <?php
-                if(function_exists('wp_nonce_field')) {
-                    wp_nonce_field('ngp_nonce_field', 'ngp_signup');
-                }
-                echo $form_fields;
-                ?>
-                <div class="submit">
+            $return .= '<form name="ngp_user_news" class="ngp_user_submission" id="ngp_signup_form" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
+            if(function_exists('wp_nonce_field')) {
+                wp_nonce_field('ngp_nonce_field', 'ngp_signup');
+            }
+            $return .= $form_fields;
+            if($thanks_url) {
+                $return .= '<input type="hidden" name="redirect_url" value="'.$thanks_url.'" />';
+            }
+            $return .= '<div class="submit">
                     <input type="submit" value="Signup!" />
                 </div>
-            </form>
-            <?php
+            </form>';
         }
+        return $return;
     }
 }
 $ngpSignupFrontend = new NGPSignupFrontend();
