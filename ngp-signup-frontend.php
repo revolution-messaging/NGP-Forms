@@ -541,5 +541,5 @@ function ngp_process_signup() {
 
 function ngp_show_signup() {
     global $ngpSignupFrontend;
-    $ngpSignupFrontend->show_form();
+    return $ngpSignupFrontend->show_form();
 }
