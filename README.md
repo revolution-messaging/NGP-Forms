@@ -76,10 +76,7 @@ We use the following on our donation pages to make sure that the user understand
 
 ### Changelog
 
-#### 1.1
-
-* COO API works for signups.
-
-#### 1.0
-
-* First version. Migrated over NGP Donations plugin. Added Volunteer and Signup options.
+* 1.1
+	* COO API works for signups.
+* 1.0
+	* First version. Migrated over NGP Donations plugin. Added Volunteer and Signup options.
