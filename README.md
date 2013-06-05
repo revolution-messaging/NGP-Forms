@@ -25,7 +25,7 @@ If you want to use this plugin, including the donation portions, in a dev enviro
 
 Place this short tag on the appropriate page or article:
 
-`[ngp_show_donation]`
+#### `[ngp_show_donation]`
 
 You can set custom amounts for the donation amount in two ways:
 
@@ -47,7 +47,7 @@ You can set custom thanks URL for the donation process by putting the url in the
 
 The donations thanks URL defaults to: `/thank-you-for-your-contribution`
 
-`[ngp_show_volunteer]`
+#### `[ngp_show_volunteer]`
 
 You can set custom thanks URL for the donation process by putting the url in the embed tag:
 
@@ -55,7 +55,7 @@ You can set custom thanks URL for the donation process by putting the url in the
 
 The volunteer thanks URL defaults to: `/thank-you-for-volunteering`
 
-`[ngp_show_signup]`
+#### `[ngp_show_signup]`
 
 You can set custom thanks URL for the email signup process by putting the url in the embed tag:
 
