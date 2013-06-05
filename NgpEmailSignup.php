@@ -125,6 +125,7 @@ class NgpEmailSignup {
             'firstName' => '', //REQUIRED
             'email' => '', //REQUIRED
             'zip' => '', //REQUIRED
+            'phone'
         );
         $this->allFields = array_merge(
             $this->constituentFields,
@@ -180,11 +181,25 @@ class NgpEmailSignup {
             $headers = array(
                 'User-agent' => 'RevMsg Wordpress Plugin (support@revmsg.com)',
             );
-            $result = $this->client->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
-                'method' => 'POST',
-                'body' => $args,
-                'headers' => $headers
-            ));
+            try {
+                $result = $this->client->request('http://www.myngp.com/ngpapi/APIService.asmx/processRequestWithCreds', array(
+                    'method' => 'POST',
+                    'body' => $args,
+                    'headers' => $headers
+                ));
+                // Need to find out what the hell that's returning
+                if($result['response']['code']==200)
+                    return true;
+                else {
+                    if($result['response']['code']==500) {
+                        echo 'The NGP COO API is not configured properly.';
+                    }
+                    return false;
+                }
+            } catch ( SoapFault $e ) {
+                $this->fault = $e;
+                return false;
+            }
         } else {
             $array = $this->generateArr();
             try {
@@ -214,9 +229,15 @@ class NgpEmailSignup {
      */
     public function isValid() {
         //Check requiredness
-        foreach( $this->requiredFields as $field ) {
-            if ( !isset($this->allFields[$field]) || empty($this->allFields[$field]) ) {
-                $this->errors[] = $field." is required";
+        if($this->userID && $this->campaignID) {
+            if(!isset($this->allFields['phone']) && !isset($this->allFields['email'])) {
+                $this->errors[] = "You must provide either an email address or phone number.";
+            }
+        } else {
+            foreach( $this->requiredFields as $field ) {
+                if ( !isset($this->allFields[$field]) || empty($this->allFields[$field]) ) {
+                    $this->errors[] = $field." is required";
+                }
             }
         }
         return empty($this->errors);

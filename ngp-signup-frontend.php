@@ -37,7 +37,15 @@ class NGPSignupFrontend {
      * Here we populate many of the above vars from the WP options.
      */
     function __construct() {
-        $this->api_key = get_option('ngp_api_key', '');
+        $this->api_key = get_option('ngp_coo_api_key', '');
+        $this->userid = get_option('ngp_userid', '');
+        $this->campaignid = get_option('ngp_campaignid', '');
+        if(empty($this->userid) && empty($this->campaignid)) {
+            $this->campaignid = null;
+            $this->userid = null;
+            $this->api_key = get_option('ngp_api_key', '');
+        }
+        
         $this->support_phone = get_option('ngp_support_phone', '');
         
         $this->redirect_url = get_option('ngp_signup_thanks_url', '/thank-you-for-signing-up');
@@ -56,6 +64,13 @@ class NGPSignupFrontend {
                 'slug' => 'email',
                 'required' => 'true',
                 'label' => 'Email Address'
+            ),
+            array(
+                'name' => 'Phone',
+                'type' => 'text',
+                'slug' => 'phone',
+                'required' => 'true',
+                'label' => 'Phone'
             ),
             array(
                 'name' => 'Zip',
@@ -90,10 +105,33 @@ class NGPSignupFrontend {
             return false;
             exit();
         }
-    
+        
         if(!empty($_POST)) {
             if(wp_verify_nonce($_POST['ngp_signup'], 'ngp_nonce_field')) // && $_POST['ngp_form_id']==$id
             {
+                if(isset($_POST['fields']) && $this->userid && $this->campaignid) {
+                    $fields = explode('|', $_POST['fields']);
+                    unset($_POST['fields']);
+                    $final_fields = array();
+                    foreach($fields as $field) {
+                        if(in_array($field, array('Name', 'Zip', 'Email', 'Phone')))
+                            $final_fields[] = $field;
+                    }
+                    foreach($this->fields as $key => $field) {
+                        if(!in_array($field['name'], $final_fields)) {
+                            unset($this->fields[$key]);
+                        }
+                    }
+                    $required = false;
+                    foreach($this->fields as $key => $field) {
+                        if($field['name']=='Phone' || $field['name']=='Email')
+                            $required = true;
+                    }
+                    
+                    if(!$required)
+                        $this->any_errors = true;
+                }
+                
                 foreach($this->fields as $key => $field) {
                     if($field['required']=='true' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']]))) {
                         $this->fields[$key]['error'] = true;
@@ -134,6 +172,7 @@ class NGPSignupFrontend {
                     if(isset($cons_data['_wp_http_referer'])) {
                         unset($cons_data['_wp_http_referer']);
                     }
+                    
                     if(isset($_POST['FullName']) && !empty($_POST['FullName'])) {
                         // Split Name
                         $names = explode(' ', $_POST['FullName']);
@@ -202,12 +241,12 @@ class NGPSignupFrontend {
                         }
                     }
                     require_once(dirname(__FILE__).'/NgpEmailSignup.php');
-                    if($this->userID && $this->campaignID) {
+                    if($this->userid && $this->campaignid) {
                         $signup = new NgpEmailSignup(array(
                                 'credentials'=>$this->api_key,
-                                'mainCode'=>$this->main_code,
-                                'userID'=>$this->userID,
-                                'campaignID'=>$this->campaignID
+                                'userID'=>$this->userid,
+                                'campaignID'=>$this->campaignid,
+                                // 'mainCode'=>$this->main_code
                             ),
                             $cons_data
                         );
@@ -244,35 +283,39 @@ class NGPSignupFrontend {
         global $wpdb, $ngp;
         
         extract( shortcode_atts( array(
-            // 'source' => null,
             'fields' => null,
             // 'main_code' => null,
             // 'campaign_id' => null,
             'thanks_url' => null
         ), $atts ) );
         
-        if($thanks_url!==null) {
-            $this->redirect_url = $thanks_url;
-        }
-        $this->main_code = $main_code;
-        $this->campaign_id = $campaign_id;
-        
         $check_config = $this->check_config();
-    
+        
         if($check_config!==true) {
             return false;
             exit();
         }
         
-        // Coming Soon (when this works with the COO API)
-        // if(isset($fields) && !empty($fields)) {
-        //     $fields = explode('|', $fields);
-        //     $final_fields = array();
-        //     foreach($fields as $field) {
-        //         if(in_array($field, array('FullName', 'Zip', 'Email', 'Phone')))
-        //             $final_fields[] = $field;
-        //     }
-        // }
+        if($thanks_url!==null) {
+            $this->redirect_url = $thanks_url;
+        }
+        
+        if($fields!==null && $this->userid && $this->campaignid) {
+            $fields = explode('|', $fields);
+            $final_fields = array();
+            foreach($fields as $field) {
+                if(in_array($field, array('Name', 'Zip', 'Email', 'Phone')))
+                    $final_fields[] = $field;
+            }
+            $custom_fields = implode('|', $final_fields);
+        } else if (!$this->userid && !$this->campaignid) {
+            unset($this->fields[2]);
+        }
+        
+        if(isset($final_fields) && !in_array('Email', $final_fields) && !in_array('Phone', $final_fields)) {
+            return 'You have to specify, at least, either the Phone or Email field.';
+            exit();
+        }
         
         if(!empty($_POST)) {
             $this->process_form();
@@ -518,11 +561,14 @@ class NGPSignupFrontend {
         if(!empty($form_fields)) {
             $return .= '<form name="ngp_user_news" class="ngp_user_submission" id="ngp_signup_form" action="'.$_SERVER['REQUEST_URI'].'" method="post">';
             if(function_exists('wp_nonce_field')) {
-                wp_nonce_field('ngp_nonce_field', 'ngp_signup');
+                $return .= wp_nonce_field('ngp_nonce_field', 'ngp_signup', true, false);
             }
             $return .= $form_fields;
-            if($thanks_url) {
+            if($thanks_url!==null) {
                 $return .= '<input type="hidden" name="redirect_url" value="'.$thanks_url.'" />';
+            }
+            if(isset($custom_fields) && $this->campaignid && $this->userid) {
+                $return .= '<input type="hidden" name="fields" value="'.$custom_fields.'" />';
             }
             $return .= '<div class="submit">
                     <input type="submit" value="Signup!" />
@@ -539,7 +585,7 @@ function ngp_process_signup() {
     $ngpSignupFrontend->process_form();
 }
 
-function ngp_show_signup() {
+function ngp_show_signup($atts) {
     global $ngpSignupFrontend;
-    return $ngpSignupFrontend->show_form();
+    return $ngpSignupFrontend->show_form($atts);
 }

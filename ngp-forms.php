@@ -1,9 +1,9 @@
 <?php
 /*
     Plugin Name: NGP Forms
-    Plugin URI: http://revolutionmessaging.com/code/ngp-donations/
+    Plugin URI: http://revolutionmessaging.com/code/ngp-forms/
     Description: Integrate NGP donation, volunteer, & signup forms with your site
-    Version: 0.3.1
+    Version: 1.1
     Author: Revolution Messaging
     Author URI: http://revolutionmessaging.com
     Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising
@@ -19,7 +19,7 @@
     */
 
 $GLOBALS['ngp'] = (object) array(
-    'version' => '0.2.8'
+    'version' => '1.1'
 );
 
 include_once(dirname(__FILE__).'/ngp-donation-frontend.php');
@@ -104,27 +104,27 @@ function ngp_admin_init() {
         'general'
     );
 
-    // register_setting('general', 'ngp_coo_api_key', 'esc_attr');
-    // add_settings_field(
-    //     'ngp_coo_api_key',
-    //     '<label for="ngp_coo_api_key">'.__('NGP COO API Key <small>(optional)</small>' , 'ngp_coo_api_key' ).'</label>',
-    //     'ngp_coo_api_key_field',
-    //     'general'
-    // );
-    // register_setting('general', 'ngp_campaignid', 'esc_attr');
-    // add_settings_field(
-    //     'ngp_campaignid',
-    //     '<label for="ngp_campaignid">'.__('NGP Campaign ID <small>(optional)</small>' , 'ngp_campaignid' ).'</label>',
-    //     'ngp_campaignid_field',
-    //     'general'
-    // );
-    // register_setting('general', 'ngp_userid', 'esc_attr');
-    // add_settings_field(
-    //     'ngp_userid',
-    //     '<label for="ngp_userid">'.__('NGP User ID <small>(optional)</small>' , 'ngp_userid' ).'</label>',
-    //     'ngp_userid_field',
-    //     'general'
-    // );
+    register_setting('general', 'ngp_coo_api_key', 'esc_attr');
+    add_settings_field(
+        'ngp_coo_api_key',
+        '<label for="ngp_coo_api_key">'.__('NGP COO API Key <small>(optional)</small>' , 'ngp_coo_api_key' ).'</label>',
+        'ngp_coo_api_key_field',
+        'general'
+    );
+    register_setting('general', 'ngp_campaignid', 'esc_attr');
+    add_settings_field(
+        'ngp_campaignid',
+        '<label for="ngp_campaignid">'.__('NGP Campaign ID <small>(optional)</small>' , 'ngp_campaignid' ).'</label>',
+        'ngp_campaignid_field',
+        'general'
+    );
+    register_setting('general', 'ngp_userid', 'esc_attr');
+    add_settings_field(
+        'ngp_userid',
+        '<label for="ngp_userid">'.__('NGP User ID <small>(optional)</small>' , 'ngp_userid' ).'</label>',
+        'ngp_userid_field',
+        'general'
+    );
 }
 
 function ngp_api_key_field() {
@@ -165,20 +165,20 @@ function ngp_footer_info() {
     echo '<textarea style="width:300px;height:150px;" id="ngp_footer_info" name="ngp_footer_info">'.$value.'</textarea>';
 }
 
-// function ngp_coo_api_key_field() {
-//     $value = get_option('ngp_coo_api_key', '');
-//     echo '<input type="text" style="width:300px;" id="ngp_coo_api_key" name="ngp_coo_api_key" value="' . $value . '" />';
-// }
-// 
-// function ngp_userid_field() {
-//     $value = get_option('ngp_userid', '');
-//     echo '<input type="text" style="width:300px;" id="ngp_userid" name="ngp_userid" value="' . $value . '" />';
-// }
-// 
-// function ngp_campaignid_field() {
-//     $value = get_option('ngp_campaignid', '');
-//     echo '<input type="text" style="width:300px;" id="ngp_campaignid" name="ngp_campaignid" value="' . $value . '" />';
-// }
+function ngp_coo_api_key_field() {
+    $value = get_option('ngp_coo_api_key', '');
+    echo '<input type="text" style="width:300px;" id="ngp_coo_api_key" name="ngp_coo_api_key" value="' . $value . '" />';
+}
+
+function ngp_userid_field() {
+    $value = get_option('ngp_userid', '');
+    echo '<input type="text" style="width:300px;" id="ngp_userid" name="ngp_userid" value="' . $value . '" />';
+}
+
+function ngp_campaignid_field() {
+    $value = get_option('ngp_campaignid', '');
+    echo '<input type="text" style="width:300px;" id="ngp_campaignid" name="ngp_campaignid" value="' . $value . '" />';
+}
 
 // register_activation_hook(__FILE__, 'psc_activate');
 // register_deactivation_hook(__FILE__, 'psc_deactivate');

@@ -3,7 +3,7 @@ Contributors: signalfade, davidholtz
 Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising, signup, volunteer
 Requires at least: 3.0.0
 Tested up to: 3.5.1
-Stable tag: 1.0
+Stable tag: 1.1
 
 Integrate NGP (NGP VAN) donation, signup, and volunteer forms with your site. You'll need an SSL certificate running on your site if you want to use the donation portion of this plugin.
 
@@ -71,6 +71,18 @@ You can set custom thanks URL for the email signup process by putting the url in
 
 The email signup thanks URL defaults to: `/thank-you-for-signing-up`
 
+==== Signup Extensive Options ====
+
+Signup can make use of the COO API, if you happen to have credentials for that particular NGP API endpoint. This API allows you to send in less comprehensive data for signups.
+
+You can find the three necessary pieces of information for configuring the plugin to use the COO API on the General Setting page.
+
+When you've configured the plugin to use the COO API, you can specify what fields you want the signup embed tag to use. You must specify _at least_ Phone or Email.
+
+`[ngp_show_signup fields="Name|Email|Phone|Zip"]`
+
+Be aware that this data will end up in your NGP consituents database without any other accompanying information if a match cannot be made to existing data.
+
 === Suggested Donation jQuery ===
 
 We use the following on our donation pages to make sure that the user understands that the radio buttons and the input field are for the same thing. If the user doesn't support javascript and the custom field holds a value, it always overrides whatever's selected in the radio buttons.
@@ -83,6 +95,9 @@ We use the following on our donation pages to make sure that the user understand
 	});
 
 == Changelog ==
+
+= 1.1 = 
+* COO API works for signups.
 
 = 1.0 =
 * First version. Migrated over NGP Donations plugin. Added Volunteer and Signup options.
