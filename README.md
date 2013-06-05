@@ -63,7 +63,7 @@ You can set custom thanks URL for the email signup process by putting the url in
 
 The email signup thanks URL defaults to: `/thank-you-for-signing-up`
 
-### Donation Suggested jQuery
+#### Donation Suggested jQuery
 
 We use the following on our donation pages to make sure that the user understands that the radio buttons and the input field are for the same thing. If the user doesn't support javascript and the custom field holds a value, it always overrides whatever's selected in the radio buttons.
 
