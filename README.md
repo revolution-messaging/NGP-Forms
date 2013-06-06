@@ -97,6 +97,8 @@ If you absolutely must have this invite form set custom amounts on your donation
 
 ### Changelog
 
+* 1.2
+	* Donation Invitation Form & Functionality
 * 1.1
 	* COO API works for signups.
 * 1.0
