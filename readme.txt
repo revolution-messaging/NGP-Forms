@@ -3,7 +3,7 @@ Contributors: signalfade, davidholtz
 Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising, signup, volunteer
 Requires at least: 3.0.0
 Tested up to: 3.5.1
-Stable tag: 1.1
+Stable tag: 1.2
 
 Integrate NGP (NGP VAN) donation, signup, and volunteer forms with your site. You'll need an SSL certificate running on your site if you want to use the donation portion of this plugin.
 
@@ -33,7 +33,7 @@ If you want to use this plugin, including the donation portions, in a dev enviro
 
 Place this short tag on the appropriate page or article:
 
-`[ngp_show_donation]`
+==== `[ngp_show_donation]`====
 
 You can set custom amounts for the donation amount in two ways:
 
@@ -55,7 +55,26 @@ You can set custom thanks URL for the donation process by putting the url in the
 
 The donations thanks URL defaults to: `/thank-you-for-your-contribution`
 
-`[ngp_show_volunteer]`
+You can turn off the custom amount field:
+
+`[ngp_show_donation custom_amt_off="true"]`
+
+===== Careful! =====
+
+_If you turn off the custom amount field and you're using the Donation Invite form, you'll have constituents entering amounts that can't be found in the form and don't have a chance of getting placed in a custom amount field!_
+
+===== Donation Suggested jQuery =====
+
+We use the following on our donation pages to make sure that the user understands that the radio buttons and the input field are for the same thing. If the user doesn't support javascript and the custom field holds a value, it always overrides whatever's selected in the radio buttons.
+
+	$('.ngp_custom_dollar_amt').keyup(function() {
+		if($(this).val()!='') { $('.Amount').attr('checked', false); }
+	});
+	$('.Amount').mouseup(function() {
+		$('.ngp_custom_dollar_amt').val('');
+	});
+
+==== `[ngp_show_volunteer]` ====
 
 You can set custom thanks URL for the donation process by putting the url in the embed tag:
 
@@ -63,7 +82,7 @@ You can set custom thanks URL for the donation process by putting the url in the
 
 The volunteer thanks URL defaults to: `/thank-you-for-volunteering`
 
-`[ngp_show_signup]`
+==== `[ngp_show_signup]` ====
 
 You can set custom thanks URL for the email signup process by putting the url in the embed tag:
 
@@ -71,7 +90,7 @@ You can set custom thanks URL for the email signup process by putting the url in
 
 The email signup thanks URL defaults to: `/thank-you-for-signing-up`
 
-==== Signup Extensive Options ====
+===== Signup Extensive Options =====
 
 Signup can make use of the COO API, if you happen to have credentials for that particular NGP API endpoint. This API allows you to send in less comprehensive data for signups.
 
@@ -83,18 +102,22 @@ When you've configured the plugin to use the COO API, you can specify what field
 
 Be aware that this data will end up in your NGP consituents database without any other accompanying information if a match cannot be made to existing data.
 
-=== Suggested Donation jQuery ===
+==== `[ngp_donation_invite_form url="/donate"]` ====
 
-We use the following on our donation pages to make sure that the user understands that the radio buttons and the input field are for the same thing. If the user doesn't support javascript and the custom field holds a value, it always overrides whatever's selected in the radio buttons.
+You must set the url that the donation invite form heads to. It must be a relative URL.
 
-	$('.ngp_custom_dollar_amt').keyup(function() {
-		if($(this).val()!='') { $('.Amount').attr('checked', false); }
-	});
-	$('.Amount').mouseup(function() {
-		$('.ngp_custom_dollar_amt').val('');
-	});
+If you want to have a donation source appended to the linked URL, put it in the embed tag:
+
+`[ngp_donation_invite_form url="/donate" source="invite-form"]`
+
+If you absolutely must have this invite form set custom amounts on your donation form, do it like this:
+
+`[ngp_donation_invite_form url="/donate/?amounts=10,20,30,40,50"]`
 
 == Changelog ==
+
+= 1.2 = 
+* Donation Invitation Form & Functionality
 
 = 1.1 = 
 * COO API works for signups.

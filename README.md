@@ -1,4 +1,4 @@
-## NGP Donations
+## NGP Forms
 
 This plugin helps you integrate NGP (NGP VAN) donation, signup, and volunteer forms with your site. You'll need an SSL certificate running on your site if you want to use the donation portion of this plugin.
 
@@ -47,6 +47,25 @@ You can set custom thanks URL for the donation process by putting the url in the
 
 The donations thanks URL defaults to: `/thank-you-for-your-contribution`
 
+You can turn off the custom amount field:
+
+`[ngp_show_donation custom_amt_off="true"]`
+
+##### Careful!
+
+_If you turn off the custom amount field and you're using the Donation Invite form, you'll have constituents entering amounts that can't be found in the form and don't have a chance of getting placed in a custom amount field!_
+
+##### Donation Suggested jQuery
+
+We use the following on our donation pages to make sure that the user understands that the radio buttons and the input field are for the same thing. If the user doesn't support javascript and the custom field holds a value, it always overrides whatever's selected in the radio buttons.
+
+	$('.ngp_custom_dollar_amt').keyup(function() {
+		if($(this).val()!='') { $('.Amount').attr('checked', false); }
+	});
+	$('.Amount').mouseup(function() {
+		$('.ngp_custom_dollar_amt').val('');
+	});
+
 #### `[ngp_show_volunteer]`
 
 You can set custom thanks URL for the donation process by putting the url in the embed tag:
@@ -63,16 +82,18 @@ You can set custom thanks URL for the email signup process by putting the url in
 
 The email signup thanks URL defaults to: `/thank-you-for-signing-up`
 
-#### Donation Suggested jQuery
+#### `[ngp_donation_invite_form url="/donate"]`
 
-We use the following on our donation pages to make sure that the user understands that the radio buttons and the input field are for the same thing. If the user doesn't support javascript and the custom field holds a value, it always overrides whatever's selected in the radio buttons.
+You must set the url that the donation invite form heads to. It must be a relative URL.
 
-	$('.ngp_custom_dollar_amt').keyup(function() {
-		if($(this).val()!='') { $('.Amount').attr('checked', false); }
-	});
-	$('.Amount').mouseup(function() {
-		$('.ngp_custom_dollar_amt').val('');
-	});
+If you want to have a donation source appended to the linked URL, put it in the embed tag:
+
+`[ngp_donation_invite_form url="/donate" source="invite-form"]`
+
+If you absolutely must have this invite form set custom amounts on your donation form, do it like this:
+
+`[ngp_donation_invite_form url="/donate/?amounts=10,20,30,40,50"]`
+
 
 ### Changelog
 

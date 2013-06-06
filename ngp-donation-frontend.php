@@ -174,7 +174,7 @@ class NGPDonationFrontend {
                         '500.00' => '$500',
                         '1000.00' => '$1,000',
                         '2600.00' => '$2,600',
-                        'custom' => '<label for="ngp_custom_dollar_amt">Other:</label> <input type="text" name="custom_dollar_amt"'.(isset($_POST['custom_dollar_amt']) ? ' value="'.$_POST['custom_dollar_amt'].'"' : '').' class="ngp_custom_dollar_amt" /> (USD)'
+                        'custom' => '<label for="ngp_custom_dollar_amt">Other:</label> $<input type="text" name="custom_dollar_amt" %s class="ngp_custom_dollar_amt" /> <small>(USD)</small>'
                     )
                 ),
                 array(
@@ -493,6 +493,7 @@ class NGPDonationFrontend {
             'amounts' => null,
             'source' => null,
             'thanks_url' => null,
+            'custom_amt_off' => 'false'
         ), $atts ) );
         
         if($thanks_url)
@@ -513,11 +514,11 @@ class NGPDonationFrontend {
             $this->custom_amt_options = array();
             
             foreach($amounts as $amount) {
-                $amt = round($amount);
-                $amt = (string) $amt;
-                $this->custom_amt_options[$amt.".00"] = '$'.$amt;
+                $ths_amt = round($amount);
+                $ths_amt = (string) $ths_amt;
+                $this->custom_amt_options[$ths_amt.".00"] = '$'.$ths_amt;
             }
-            $this->custom_amt_options['custom'] = '<label for="ngp_custom_dollar_amt">Other:</label> <input type="text" name="custom_dollar_amt"'.(isset($_POST['custom_dollar_amt']) ? ' value="'.$_POST['custom_dollar_amt'].'"' : '').' class="ngp_custom_dollar_amt" /> (USD)';
+            $this->custom_amt_options['custom'] = '<label for="ngp_custom_dollar_amt">Other:</label> $<input type="text" name="custom_dollar_amt" %s class="ngp_custom_dollar_amt" /> <small>(USD)</small>';
         }
         
         if(!empty($_POST)) {
@@ -687,12 +688,36 @@ class NGPDonationFrontend {
                         } else {
                             $the_options = $field['options'];
                         }
+                        
+                        if(isset($_GET['amt']) && empty($_POST)) {
+                            if(strpos($_GET['amt'], '.')===false) {
+                                $get_amt = $_GET['amt'].'.00';
+                            } else {
+                                $get_amt = $_GET['amt'];
+                            }
+                            
+                            if(array_key_exists($get_amt, $the_options)) {
+                                $amt = $get_amt;
+                            } else {
+                                $custom_amt = $_GET['amt'];
+                            }
+                        } else if(isset($_POST['custom_dollar_amt'])) {
+                            $custom_amt = $_POST['custom_dollar_amt'];
+                        } else if(isset($_POST[$field['slug']])) {
+                            $amt = $_POST[$field['slug']];
+                        }
+                        
                         foreach($the_options as $val => $labe) {
                             $i++;
-                            if($val=='custom') {
-                                $form_fields .= '<div class="radio custom-donation-amt">'.$labe.'</div>'."\r\n";
+                            if($val=='custom' && $custom_amt_off=='false') {
+                                $replace = (isset($custom_amt)) ? 'value="'.$custom_amt.'"' : '';
+                                $form_fields .= '<div class="radio custom-donation-amt">'.sprintf($labe, $replace).'</div>'."\r\n";
                             } else {
-                                $form_fields .= '<div class="radio"><input type="radio" value="'.$val.'" name="'.$field['slug'].'" id="'.$i.'_'.$field['slug'].'" class="'.$field['slug'].'"> <label for="'.$i.'_'.$field['slug'].'">'.$labe.'</label></div>'."\r\n";
+                                $form_fields .= '<div class="radio"><input type="radio" value="'.$val.'" name="'.$field['slug'].'" id="'.$i.'_'.$field['slug'].'" class="'.$field['slug'].'"';
+                                if(isset($amt) && $amt==$val) {
+                                    $form_fields .= ' checked';
+                                }
+                                $form_fields .= '> <label for="'.$i.'_'.$field['slug'].'">'.$labe.'</label></div>'."\r\n";
                             }
                         }
                         $form_fields .= '</fieldset>';
@@ -812,6 +837,41 @@ class NGPDonationFrontend {
             return $return;
         }
     }
+    
+    function donation_invite_form($atts=null) {
+        extract( shortcode_atts( array(
+            'url' => null,
+            'source' => null,
+            'submit' => '&raquo;',
+        ), $atts ) );
+        if($url) {
+            $url_components = parse_url($url);
+            if(isset($url_components['path']) && !isset($url_components['scheme']) && !isset($url_components['host'])) {
+                $return = '<form action="'.$url_components['path'].'" method="GET" id="ngp-donate-invite"><label for="ngp-donate-amt">Donate $<input type="text" id="ngp-donate-amt" name="amt" value=""><input type="submit" value="'.$submit.'">';
+                
+                if(isset($url_components['query'])) {
+                    $queries = explode('&', $url_components['query']);
+                    foreach($queries as $query) {
+                        $this_query = explode('=', $query);
+                        if(count($this_query)==2) {
+                            $return .= '<input name="'.$this_query[0].'" value="'.$this_query[1].'" type="hidden" />';
+                        }
+                    }
+                }
+                if($source) {
+                    $return .= '<input name="source" value="'.$source.'" />';
+                }
+                $return .= '</label></form>';
+            } else if(isset($url_components['scheme']) || isset($url_components['host'])) {
+                return '<p>URL was not configured properly. Should be for your site and relative. e.g. <code>/donate</code></p>';
+            } else {
+                return '<p>URL was not configured properly.</p>';
+            }
+            return $return;
+        } else {
+            return '<p>No Url was configured.</p>';
+        }
+    }
 }
 $ngpDonationFrontend = new NGPDonationFrontend();
 
@@ -823,4 +883,9 @@ function ngp_process_form() {
 function ngp_show_form($atts=null) {
     global $ngpDonationFrontend;
     return $ngpDonationFrontend->show_form($atts);
+}
+
+function ngp_donation_invite_form($atts=null) {
+    global $ngpDonationFrontend;
+    return $ngpDonationFrontend->donation_invite_form($atts);
 }
