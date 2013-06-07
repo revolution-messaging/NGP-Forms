@@ -845,21 +845,39 @@ class NGPDonationFrontend {
             'submit' => '&raquo;',
         ), $atts ) );
         if($url) {
+            $server_url_parts = explode('.', $_SERVER["SERVER_NAME"]);
+            if(!empty($this->url_specified) && $server_url_parts[count($server_url_parts)-1]!=='dev') {
+                $url_parts = $this->url_specified;
+            } else {
+                $url_parts = $server_url_parts;
+            }
+            if($_SERVER["HTTPS"] != "on" && $url_parts[count($url_parts)-1]!=='dev') {
+                if(!empty($this->url_specified)) {
+                    $newurl = "https://" . $this->url_specified;
+                } else {
+                    $newurl = "https://" . $_SERVER["SERVER_NAME"];
+                }
+            } else {
+                $newurl = '';
+            }
             $url_components = parse_url($url);
             if(isset($url_components['path']) && !isset($url_components['scheme']) && !isset($url_components['host'])) {
-                $return = '<form action="'.$url_components['path'].'" method="GET" id="ngp-donate-invite"><label for="ngp-donate-amt">Donate $<input type="text" id="ngp-donate-amt" name="amt" value=""><input type="submit" value="'.$submit.'">';
+                $return = '<form action="'.$newurl.$url_components['path'].'" method="GET" id="ngp-donate-invite"><label for="ngp-donate-amt">Donate $<input type="text" id="ngp-donate-amt" name="amt" value=""><input type="submit" value="'.$submit.'">';
                 
                 if(isset($url_components['query'])) {
                     $queries = explode('&', $url_components['query']);
                     foreach($queries as $query) {
                         $this_query = explode('=', $query);
                         if(count($this_query)==2) {
-                            $return .= '<input name="'.$this_query[0].'" value="'.$this_query[1].'" type="hidden" />';
+                            $return .= '<input type="hidden" name="'.$this_query[0].'" value="'.$this_query[1].'" />';
                         }
                     }
                 }
+                if(isset($_GET['devtest'])) {
+                    $return .= '<input type="hidden" name="devtest" value="true" />';
+                }
                 if($source) {
-                    $return .= '<input name="source" value="'.$source.'" />';
+                    $return .= '<input type="hidden" name="source" value="'.$source.'" />';
                 }
                 $return .= '</label></form>';
             } else if(isset($url_components['scheme']) || isset($url_components['host'])) {

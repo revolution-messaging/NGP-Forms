@@ -3,7 +3,7 @@ Contributors: signalfade, davidholtz
 Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising, signup, volunteer
 Requires at least: 3.0.0
 Tested up to: 3.5.1
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 
 Integrate NGP (NGP VAN) donation, signup, and volunteer forms with your site. You'll need an SSL certificate running on your site if you want to use the donation portion of this plugin.
 
@@ -115,6 +115,10 @@ If you absolutely must have this invite form set custom amounts on your donation
 `[ngp_donation_invite_form url="/donate/?amounts=10,20,30,40,50"]`
 
 == Changelog ==
+
+= 1.2.3 =
+* Fixed https link from donation invite form
+* Added type "hidden" to source input on invite form
 
 = 1.2.2 =
 * (Another) Fix Readme
