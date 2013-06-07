@@ -97,6 +97,8 @@ If you absolutely must have this invite form set custom amounts on your donation
 
 ### Changelog
 
+* 1.2.2
+	* (Another) Fix Readme
 * 1.2.1
 	* Fix Wordpress Readme
 * 1.2
