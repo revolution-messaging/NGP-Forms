@@ -97,6 +97,9 @@ If you absolutely must have this invite form set custom amounts on your donation
 
 ### Changelog
 
+* 1.2.3
+	* Fixed https link from donation invite form
+	* Added type "hidden" to source input on invite form
 * 1.2.2
 	* (Another) Fix Readme
 * 1.2.1
