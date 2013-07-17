@@ -2,8 +2,8 @@
 Contributors: signalfade, davidholtz
 Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising, signup, volunteer
 Requires at least: 3.0.0
-Tested up to: 3.5.1
-Stable tag: 1.2.3
+Tested up to: 3.5.2
+Stable tag: 1.2.4
 
 Integrate NGP "Classic" (NGP VAN) donation, signup, and volunteer forms with your site. You'll need an SSL certificate running on your site if you want to use the donation portion of this plugin.
 
@@ -17,7 +17,11 @@ This plugin _does not_ work with the new NGP Action Platform.
 
 This plugin is built and maintained by [Revolution Messaging, LLC](http://revolutionmessaging.com) and makes use of the New Media Campaigns' NGP Donations API class.
 
-### Alert!
+### Alert No. 1!
+
+This plugin does *not* work with NGP's recently released "NEW" platform. I think they call it the "Action" platform, but it's unclear.
+
+### Alert No. 2!
 
 You should be running your site under an SSL certificate if you utilize this plugin for donations.
 
@@ -119,6 +123,9 @@ If you absolutely must have this invite form set custom amounts on your donation
 `[ngp_donation_invite_form url="/donate/?amounts=10,20,30,40,50"]`
 
 == Changelog ==
+
+= 1.2.4 =
+* Another Alert.
 
 = 1.2.3 =
 * Fixed https link from donation invite form

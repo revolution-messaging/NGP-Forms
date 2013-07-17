@@ -6,7 +6,11 @@ This plugin _does not_ work with the new NGP Action Platform.
 
 This plugin is built and maintained by [Revolution Messaging, LLC](http://revolutionmessaging.com) and makes use of the New Media Campaigns' NGP Donations API class.
 
-### Alert!
+### Alert No. 1!
+
+This plugin does *not* work with NGP's recently released "NEW" platform. I think they call it the "Action" platform, but it's unclear.
+
+### Alert No. 2!
 
 You should be running your site under an SSL certificate if you utilize this plugin for donations.
 
@@ -98,6 +102,8 @@ If you absolutely must have this invite form set custom amounts on your donation
 
 ### Changelog
 
+* 1.2.4
+	* Another Alert.
 * 1.2.3
 	* Fixed https link from donation invite form
 	* Added type "hidden" to source input on invite form
