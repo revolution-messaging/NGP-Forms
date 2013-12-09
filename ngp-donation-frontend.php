@@ -235,7 +235,7 @@ class NGPDonationFrontend {
         $y = (int)date('Y');
         $y_short = (int)date('y');
         while($y < (int)date('Y', strtotime('+19 years'))) {
-            $this->fieldsets['Credit card'][3]['options'][$y_short] = $y;
+            $this->fieldsets['Credit Card'][3]['options'][$y_short] = $y;
             $y+=1;
             $y_short+=1;
         }

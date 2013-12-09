@@ -3,7 +3,7 @@ Contributors: signalfade, davidholtz
 Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising, signup, volunteer
 Requires at least: 3.0.0
 Tested up to: 3.5.2
-Stable tag: 1.2.4
+Stable tag: 1.2.6
 
 Integrate NGP "Classic" (NGP VAN) donation, signup, and volunteer forms with your site. You'll need an SSL certificate running on your site if you want to use the donation portion of this plugin.
 
@@ -124,8 +124,10 @@ If you absolutely must have this invite form set custom amounts on your donation
 
 == Changelog ==
 
+= 1.2.6 =
+* Bugfix for CC legend dupe
 
-= 1.2.4 =
+= 1.2.5 =
 * Employment info can be specialized.
 * Addt'l footer info has become (and can replace) compliance info. Accepts simplified HTML (i, b, u) and respects line-breaks.
 * Credit Card legend now ucwords.
