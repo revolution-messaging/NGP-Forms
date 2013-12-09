@@ -91,6 +91,7 @@ class NGPDonationFrontend {
      * Here we populate many of the above vars from the WP options.
      */
     function __construct() {
+        $this->employment_info = trim(get_option('ngp_employment_info', ''));
         $this->api_key = get_option('ngp_api_key', '');
         $this->url_specified = get_option('ngp_secure_url', '');
         $this->support_phone = get_option('ngp_support_phone', '');
@@ -159,7 +160,7 @@ class NGPDonationFrontend {
                     'label' => 'Occupation'
                 )
             ),
-            'Credit card' => array(
+            'Credit Card' => array(
                 'html_intro' => '<p id="accepted-cards" style="margin: 0pt 0pt -5px; background: url(/wp-content/plugins/'.plugin_basename(dirname(__FILE__)).'/credit-card-logos.png) no-repeat scroll 0% 0% transparent; text-indent: -900em; width: 211px; height: 34px;">We accept Visa, Mastercard, American Express and Discover cards.</p>',
                 array(
                     'type' => 'radio',
@@ -534,7 +535,12 @@ class NGPDonationFrontend {
         
         foreach($this->fieldsets as $fieldset_name => $fields) {
             $form_fields .= '<fieldset><legend>'.$fieldset_name.'</legend>';
-            if(isset($fields['html_intro'])) {
+            if($fieldset_name=='Employment' && $this->employment_info!='') {
+                $form_fields .= '<p>'.$this->employment_info.'</p>';
+                if(isset($fields['html_intro'])) {
+                    unset($fields['html_intro']);
+                }
+            } else if(isset($fields['html_intro'])) {
                 $form_fields .= $fields['html_intro'];
                 unset($fields['html_intro']);
             }
@@ -821,7 +827,10 @@ class NGPDonationFrontend {
             $return .= '
                 <div class="submit">
                     <input type="submit" value="Donate Now" />
-                </div>
+                </div>';
+            $donation_footer_info = trim(get_option('ngp_footer_info', ''));
+            if(empty($donation_footer_info)) {
+                $return .= '
                 <p class="ngp-small-print">By clicking on the "Donate now" button above you confirm that the following statements are true and accurate:</small>
                 <ol class="ngp-small-print">
                     <li>I am a United States citizen or a lawfully admitted permanent resident of the United States.</li>
@@ -831,7 +840,9 @@ class NGPDonationFrontend {
                     <li>The funds I am donating are not being provided to me by another person or entity for the purpose of making this contribution.</li>
                 </ol>
                 ';
-            $return .= '<p class="addtl-donation-footer-info">'.str_replace("\r\n", '<br />', str_replace('&lt;i&gt;', '<i>', str_replace('&lt;/i&gt;', '</i>', str_replace('&lt;u&gt;', '<u>', str_replace('&lt;/u&gt;', '</u>', str_replace('&lt;b&gt;', '<b>', str_replace('&lt;/b&gt;', '</b>', get_option('ngp_footer_info')))))))).'</p>';
+            } else {
+                $return .= '<p class="addtl-donation-footer-info">'.str_replace("\r\n", '<br />', str_replace('&lt;i&gt;', '<i>', str_replace('&lt;/i&gt;', '</i>', str_replace('&lt;u&gt;', '<u>', str_replace('&lt;/u&gt;', '</u>', str_replace('&lt;b&gt;', '<b>', str_replace('&lt;/b&gt;', '</b>', $donation_footer_info))))))).'</p>';
+            }
             $return .= '</form>';
             
             return $return;

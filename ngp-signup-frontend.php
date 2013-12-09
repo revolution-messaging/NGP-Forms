@@ -190,7 +190,7 @@ class NGPSignupFrontend {
                             // Check for Prefix
                             array_walk($namePrefixes, function($value, $key, &$the_names) {
                                 if(strlen($the_names[0])==strlen($value) && stripos($the_names[0], $value)!==false && isset($the_names[0])) {
-                                    $the_names['prefix'] = $value;
+                                    $the_names['prefix'] = $value.'.';
                                     unset($the_names[0]);
                                 }
                             }, &$names);

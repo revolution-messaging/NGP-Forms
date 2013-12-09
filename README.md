@@ -102,6 +102,10 @@ If you absolutely must have this invite form set custom amounts on your donation
 
 ### Changelog
 
+* 1.2.5
+	* Employment info can be specialized.
+	* Addt'l footer info has become (and can replace) compliance info. Accepts simplified HTML (i, b, u) and respects line-breaks.
+	* Credit Card legend now ucwords.
 * 1.2.4
 	* Another Alert.
 * 1.2.3

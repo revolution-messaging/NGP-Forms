@@ -3,7 +3,7 @@
     Plugin Name: NGP Forms
     Plugin URI: http://revolutionmessaging.com/code/ngp-forms/
     Description: Integrate NGP donation, volunteer, & signup forms with your site
-    Version: 1.2.4
+    Version: 1.2.5
     Author: Revolution Messaging
     Author URI: http://revolutionmessaging.com
     Tags: NGP, NGPVAN, Voter Action Network, donations, FEC, politics, fundraising
@@ -100,11 +100,18 @@ function ngp_admin_init() {
     register_setting('general', 'ngp_footer_info', 'esc_attr');
     add_settings_field(
         'ngp_footer_info',
-        '<label for="ngp_footer_info">'.__('Addt\'l Information for Donation Footer' , 'ngp_footer_info' ).'</label>',
+        '<label for="ngp_footer_info">'.__('Compliance info' , 'ngp_footer_info' ).'</label>',
         'ngp_footer_info',
         'general'
     );
 
+    register_setting('general', 'ngp_employment_info', 'esc_attr');
+    add_settings_field(
+        'ngp_employment_info',
+        '<label for="ngp_employment_info">'.__('Employment info' , 'ngp_employment_info' ).'</label>',
+        'ngp_employment_info',
+        'general'
+    );
     register_setting('general', 'ngp_coo_api_key', 'esc_attr');
     add_settings_field(
         'ngp_coo_api_key',
@@ -161,8 +168,20 @@ function ngp_accept_amex() {
         echo '<input type="checkbox" id="ngp_accept_amex" name="ngp_accept_amex" />';
 }
 
+function ngp_employment_info() {
+    $value = get_option('ngp_employment_info', '');
+    echo '<textarea style="width:300px;height:150px;" id="ngp_employment_info" name="ngp_employment_info">'.$value.'</textarea>';
+}
+
 function ngp_footer_info() {
-    $value = get_option('ngp_footer_info', '');
+    $value = get_option('ngp_footer_info', '<p class="ngp-small-print">By clicking on the "Donate now" button above you confirm that the following statements are true and accurate:</small>
+<ol class="ngp-small-print">
+<li>I am a United States citizen or a lawfully admitted permanent resident of the United States.</li>
+<li>This contribution is not made from the general treasury funds of a corporation, labor organization or national bank.</li>
+<li>This contribution is not made from the treasury of an entity or person who is a federal contractor.</li>
+<li>This contribution is not made from the funds of a political action committee.</li>
+<li>The funds I am donating are not being provided to me by another person or entity for the purpose of making this contribution.</li>
+</ol>');
     echo '<textarea style="width:300px;height:150px;" id="ngp_footer_info" name="ngp_footer_info">'.$value.'</textarea>';
 }
 
