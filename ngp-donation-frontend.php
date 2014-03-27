@@ -347,11 +347,8 @@ class NGPDonationFrontend {
                         unset($payment_data['ngp_add']);
                         unset($payment_data['FullName']);
                         unset($payment_data['_wp_http_referer']);
-                        
-                        array_walk($names, function(&$value) {
-                            $chars = "\t\n\r\0\x0B,.[]{};:\"'\x00..\x1F";
-                            $value = trim($value, $chars);
-                        });
+
+                        array_walk($names, ngp_donation_trim_walk);
                         if(count($names)==1) {
                             $payment_data['LastName'] = $names[0];
                         } else if(count($names)==2) {
@@ -365,7 +362,7 @@ class NGPDonationFrontend {
                                     unset($the_names[0]);
                                 }
                             }, &$names);
-                            
+
                             // Check for Suffix
                             array_walk($nameSuffixes, function($value, $key, &$the_names) {
                                 $possible_suffix = null;
@@ -917,4 +914,8 @@ function ngp_show_form($atts=null) {
 function ngp_donation_invite_form($atts=null) {
     global $ngpDonationFrontend;
     return $ngpDonationFrontend->donation_invite_form($atts);
+}
+function ngp_donation_trim_walk(&$value) {
+    $chars = "\t\n\r\0\x0B,.[]{};:\"'\x00..\x1F";
+    $value = trim($value, $chars);
 }
